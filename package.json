@@ -1,0 +1,14 @@
+{
+  "name": "BlkChain_01",
+  "version": "1.0",
+  "description": "Blockchain dev",
+  "main": "index.js",
+  "repository": "http://localhost:3000/",
+  "author": "Igor Martins",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "i": "^0.3.6",
+    "sha256": "^0.2.0"
+  }
+}

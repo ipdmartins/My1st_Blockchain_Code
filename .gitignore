@@ -1,0 +1,8 @@
+
+# NPM / Yarn
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Vscode workspaces
+*.code-workspace
