@@ -4,6 +4,10 @@ const sha256 = require('sha256');
 function Blockchain() {
     this.chain = [];
     this.pendingTransactions = [];
+
+    //this is called the Genesus block, the 1st one of the chain. So it receives arbitrarian
+    //parameters. However, the upcoming blocks must get legitimate parameters to run properly.
+    this.createNewBlock(10, '0', '0');
 }
 
 Blockchain.prototype.createNewBlock = function(nonce, hash, previousBlockHash) {
@@ -42,6 +46,24 @@ Blockchain.prototype.hashBlock = function(previousBlockHash, currentBlockData, n
     const dataAsString = previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
     const hash = sha256(dataAsString);
     return hash;
+};
+
+/*The proof aims to get the parameters and repeatedly mine new hash codes untill it finds the 
+any hash, starting with four zeros like '0000LJH2HG5KJ2G5KG25GK2'. To do that an algorithm
+keeps constantly changing the nonce. It takes a very high computing proccessing and high amount
+of energy. It becomes safe because anyone that tries to remine the hash to get the exact result,
+would also to recreate every previous block that is linked to this one. After that they should
+recreate the entire blockchain to a new one. It would spend an incredible amount of energy and 
+complex calculations that makes the task not feasible. */
+Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData) {
+    let nonce = 0;
+    let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+    while (hash.substring(0, 4) !== '0000') {
+        nonce++;
+        hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+    }
+    console.log(hash);
+    return nonce;
 };
 
 module.exports = Blockchain;
