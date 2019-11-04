@@ -1,14 +1,21 @@
 {
-  "name": "BlkChain_01",
-  "version": "1.0",
-  "description": "Blockchain dev",
-  "main": "index.js",
-  "repository": "http://localhost:3000/",
-  "author": "Igor Martins",
-  "license": "MIT",
-  "private": false,
-  "dependencies": {
-    "i": "^0.3.6",
-    "sha256": "^0.2.0"
-  }
+    "name": "BlkChain_01",
+    "version": "1.0",
+    "description": "Blockchain dev",
+    "main": "index.js",
+    "repository": "http://localhost:3000/",
+    "scripts": {
+        "start": "nodemon --watch dev -e js src/api.js"
+    },
+    "author": "Igor Martins",
+    "license": "MIT",
+    "private": false,
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "i": "^0.3.6",
+        "nodemon": "^1.19.4",
+        "sha256": "^0.2.0",
+        "uuid": "^3.3.3"
+    }
 }
