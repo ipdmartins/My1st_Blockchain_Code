@@ -1,9 +1,14 @@
 const sha256 = require('sha256');
 
+//it gets the url localhost address registered in package.json
+const currentNodeUrl = process.argv[3];
+
 //example of Javascpript constructor
 function Blockchain() {
     this.chain = [];
     this.pendingTransactions = [];
+    this.currentNodeUrl = currentNodeUrl;
+    this.networkNodes = [];
 
     //this is called the Genesus block, the 1st one of the chain. So it receives arbitrarian
     //parameters. However, the upcoming blocks must get legitimate parameters to run properly.

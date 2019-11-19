@@ -5,7 +5,12 @@
     "main": "index.js",
     "repository": "http://localhost:3000/",
     "scripts": {
-        "start": "nodemon --watch dev -e js src/api.js"
+        "test": "echo\"Error: no test specified\" && exit 1",
+        "node_1": "nodemon --watch dev -e js src/networknode.js 3001 http://localhost:3001",
+        "node_2": "nodemon --watch dev -e js src/networknode.js 3002 http://localhost:3002",
+        "node_3": "nodemon --watch dev -e js src/networknode.js 3003 http://localhost:3003",
+        "node_4": "nodemon --watch dev -e js src/networknode.js 3004 http://localhost:3004",
+        "node_5": "nodemon --watch dev -e js src/networknode.js 3005 http://localhost:3005"
     },
     "author": "Igor Martins",
     "license": "MIT",
@@ -15,6 +20,7 @@
         "express": "^4.17.1",
         "i": "^0.3.6",
         "nodemon": "^1.19.4",
+        "request-promise": "^4.2.5",
         "sha256": "^0.2.0",
         "uuid": "^3.3.3"
     }
