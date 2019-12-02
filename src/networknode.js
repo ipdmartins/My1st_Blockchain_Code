@@ -61,34 +61,57 @@ personal records register_nodes_bulk. All this proccess serve to let every node 
 aware about the others.*/
 
 //register a node and brodcast it to the network
-app.post('/register_and_brodcast_node', function (req, res) {
+app.post('/register-and-broadcast-node', function (req, res) {
     const newNodeUrl = req.body.newNodeUrl;
-    //it means that if my newNodeUrl is not in the networkNodes, then push it into.
-    if (bitcoin.networkNodes.indexOf(newNodeUrl) == -1) {
-        bitcoin.networkNodes.push(newNodeUrl);
-    }
-    const regNodePromises = [];
-    //for every node inside the network, it'll register register the newNodeUrl to them
+    if (bitcoin.networkNodes.indexOf(newNodeUrl) == -1) bitcoin.networkNodes.push(newNodeUrl);
+
+    const regNodesPromises = [];
     bitcoin.networkNodes.forEach(networkNodeUrl => {
-        const requesOptions = {
+        const requestOptions = {
             uri: networkNodeUrl + '/register-node',
             method: 'POST',
             body: { newNodeUrl: newNodeUrl },
             json: true
         };
-        regNodePromises.push(rp(requesOptions));
-        Promise.all(regNodePromises)
-            .then(data => {
 
-            });
+        regNodesPromises.push(rp(requestOptions));
     });
+
+    Promise.all(regNodesPromises)
+        .then(data => {
+            const bulkRegisterOptions = {
+                uri: newNodeUrl + '/register-nodes-bulk',
+                method: 'POST',
+                body: { allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl] },
+                json: true
+            };
+
+            return rp(bulkRegisterOptions);
+        })
+        .then(data => {
+            res.json({ note: 'New node registered with network successfully.' });
+        });
 });
 
 //register a node with network
-app.post('/register_node', function (req, res) { });
+app.post('/register-node', function (req, res) {
+    const newNodeUrl = req.body.newNodeUrl;
+    const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(newNodeUrl) == -1;
+    const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
+    if (nodeNotAlreadyPresent && notCurrentNode) bitcoin.networkNodes.push(newNodeUrl);
+    res.json({ note: 'New node registered successfully.' });
+});
 
 //register multiple nodes at once
-app.post('/register_nodes_bulk', function (req, res) { });
+app.post('/register-nodes-bulk', function (req, res) {
+    const allNetworkNodes = req.body.allNetworkNodes;
+    allNetworkNodes.forEach(networkNodeUrl => {
+        const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(networkNodeUrl) == -1;
+        const notCurrentNode = bitcoin.currentNodeUrl !== networkNodeUrl;
+        if (nodeNotAlreadyPresent && notCurrentNode) bitcoin.networkNodes.push(networkNodeUrl);
+    });
+    res.json({ note: 'Bulk registration successful.' });
+});
 
 app.listen(port, function () {
     console.log(`Listening on port ${port}...`);
