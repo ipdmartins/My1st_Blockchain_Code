@@ -1,4 +1,5 @@
 const sha256 = require('sha256');
+const uuid = require('uuid/v1');
 
 //it gets the url localhost address registered in package.json
 const currentNodeUrl = process.argv[3];
@@ -15,7 +16,7 @@ function Blockchain() {
     this.createNewBlock(10, '0', '0');
 }
 
-Blockchain.prototype.createNewBlock = function(nonce, hash, previousBlockHash) {
+Blockchain.prototype.createNewBlock = function (nonce, hash, previousBlockHash) {
     //every new block will look like this
     const newBlock = {
         index: this.chain.length + 1,
@@ -30,23 +31,28 @@ Blockchain.prototype.createNewBlock = function(nonce, hash, previousBlockHash) {
     return newBlock;
 };
 
-Blockchain.prototype.getLasBlock = function() {
+Blockchain.prototype.getLasBlock = function () {
     return this.chain[this.chain.length - 1];
 };
 
 //recipient is the one who receive
-Blockchain.prototype.createNewTransaction = function(amount, sender, recipient) {
+Blockchain.prototype.createNewTransaction = function (amount, sender, recipient) {
     const newTransaction = {
         amount: amount,
         sender: sender,
-        recipient: recipient
+        recipient: recipient,
+        transactionId: uuid().split('-').join('')
     };
-    this.pendingTransactions.push(newTransaction);
-    return this.getLasBlock()['index'] + 1;
+    return newTransaction;
 };
 
+Blockchain.prototype.addTransactionToPendingTransactions = function (transactionObj) {
+    this.pendingTransactions.push(transactionObj);
+    return this.getLasBlock()['index'] + 1;
+}
+
 //the 3 parameters received by this function will be converted by sha256 in a single String code
-Blockchain.prototype.hashBlock = function(previousBlockHash, currentBlockData, nonce) {
+Blockchain.prototype.hashBlock = function (previousBlockHash, currentBlockData, nonce) {
     //currentBlockData is an object with data inside and must be converted to String.
     const dataAsString = previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
     const hash = sha256(dataAsString);
@@ -60,7 +66,7 @@ of energy. It becomes safe because anyone that tries to remine the hash to get t
 would also to recreate every previous block that is linked to this one. After that they should
 recreate the entire blockchain to a new one. It would spend an incredible amount of energy and 
 complex calculations that makes the task not feasible. */
-Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData) {
+Blockchain.prototype.proofOfWork = function (previousBlockHash, currentBlockData) {
     let nonce = 0;
     let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
     while (hash.substring(0, 4) !== '0000') {
