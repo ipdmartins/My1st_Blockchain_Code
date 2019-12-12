@@ -2,6 +2,113 @@ const Blockchain = require('./blockchain');
 
 const bitcoin = new Blockchain();
 
+
+// 20191211094329
+// http://localhost:3001/blockchain
+
+const bc1 = {
+    "chain": [
+        {
+            "index": 1,
+            "timeStamp": 1576067770644,
+            "transactions": [
+
+            ],
+            "nonce": 10,
+            "hash": "0",
+            "previousBlockHash": "0"
+        },
+        {
+            "index": 2,
+            "timeStamp": 1576067868646,
+            "transactions": [
+
+            ],
+            "nonce": 18140,
+            "hash": "0000b9135b054d1131392c9eb9d03b0111d4b516824a03c35639e12858912100",
+            "previousBlockHash": "0"
+        },
+        {
+            "index": 3,
+            "timeStamp": 1576068145552,
+            "transactions": [
+                {
+                    "amount": 12.5,
+                    "sender": "00",
+                    "recipient": "cf9e04501c1211ea8040f56df76409fc",
+                    "transactionId": "0a2143d01c1311ea8040f56df76409fc"
+                },
+                {
+                    "amount": 8,
+                    "sender": "JRJ99F9SkfhL2J4L2J",
+                    "recipient": "JLJ4LJFSD4FDF4HFGHS4FJ3L",
+                    "transactionId": "463cfda01c1311ea8040f56df76409fc"
+                },
+                {
+                    "amount": 16,
+                    "sender": "JRJ99F9SkfDFAhL2J4L2J",
+                    "recipient": "JLJ4LJFSFSDD4FDF4HFGHS4FJ3L",
+                    "transactionId": "5a03db601c1311ea8040f56df76409fc"
+                },
+                {
+                    "amount": 24,
+                    "sender": "JRJ99F9SkfDFAhASDWEY4L2J",
+                    "recipient": "JLJ4LJFSFSDD4FDFLJ,GHS4FJ3L",
+                    "transactionId": "61c973501c1311ea8040f56df76409fc"
+                }
+            ],
+            "nonce": 71561,
+            "hash": "00007e63cd1cf0a3f325c1c12dd41b6a6acfd37bbe944df5fcac1acddbedfb7f",
+            "previousBlockHash": "0000b9135b054d1131392c9eb9d03b0111d4b516824a03c35639e12858912100"
+        },
+        {
+            "index": 4,
+            "timeStamp": 1576068202951,
+            "transactions": [
+                {
+                    "amount": 12.5,
+                    "sender": "00",
+                    "recipient": "cf9e04501c1211ea8040f56df76409fc",
+                    "transactionId": "af1497201c1311ea8040f56df76409fc"
+                },
+                {
+                    "amount": 7,
+                    "sender": "JRJ99F9SkfDFAWQQWEY4L2J",
+                    "recipient": "JLJ4LJFSFSD23EFDFLJ,GHS4FJ3L",
+                    "transactionId": "c523b7301c1311ea8040f56df76409fc"
+                },
+                {
+                    "amount": 14,
+                    "sender": "J3439F9SkfDFAWQQWEY4L2J",
+                    "recipient": "JLJ4LJT3RD23EFDFLJ,GHS4FJ3L",
+                    "transactionId": "ccbd36101c1311ea8040f56df76409fc"
+                }
+            ],
+            "nonce": 116352,
+            "hash": "00000e50f1939f9433c8ae09ef0d2ec16652ee7ecef02bfc698b550baa6e0c65",
+            "previousBlockHash": "00007e63cd1cf0a3f325c1c12dd41b6a6acfd37bbe944df5fcac1acddbedfb7f"
+        }
+    ],
+    "pendingTransactions": [
+        {
+            "amount": 12.5,
+            "sender": "00",
+            "recipient": "cf9e04501c1211ea8040f56df76409fc",
+            "transactionId": "d14ad4801c1311ea8040f56df76409fc"
+        }
+    ],
+    "currentNodeUrl": "http://localhost:3001",
+    "networkNodes": [
+
+    ]
+};
+
+console.log('Valid', bitcoin.chainIsValid(bc1.chain));
+
+
+
+/*
+
 console.log(bitcoin.chain[0]);
 
 const previousBlockHash = 'DF4A6G4S89HDA6D4FA6SD4G';
@@ -32,7 +139,7 @@ console.log(nonce);
 //change a single letter in the parameters, it has to generate a complete diferent hash.
 console.log(bitcoin.hashBlock(previousBlockHash, currentBlockData, nonce));
 
-/*
+
 //previous block
 bitcoin.createNewBlock(1980, 'EREOJASFJJRUEU98', 'DF4A6G4S89HDA6D4FA6SD4G');
 
