@@ -1,7 +1,7 @@
-const sha256 = require('sha256');
-const uuid = require('uuid/v1');
+const sha256 = require('sha256');//serves to use the hash inside the system.
+const uuid = require('uuid/v1');//serves to create a unique random string.
 
-//it gets the url localhost address registered in package.json
+//it gets the url localhost address registered in package.json, thus every node know where they are
 const currentNodeUrl = process.argv[3];
 
 //example of Javascpript constructor
@@ -15,25 +15,6 @@ function Blockchain() {
     //parameters. However, the upcoming blocks must get legitimate parameters to run properly.
     this.createNewBlock(10, '0', '0');
 }
-
-Blockchain.prototype.createNewBlock = function (nonce, hash, previousBlockHash) {
-    //every new block will look like this
-    const newBlock = {
-        index: this.chain.length + 1,
-        timeStamp: Date.now(),
-        transactions: this.pendingTransactions,
-        nonce: nonce, //it's a number that refers to a proof of work
-        hash: hash, //all transactions will be compressed in a single String of data
-        previousBlockHash: previousBlockHash //all data from the previous block
-    };
-    this.pendingTransactions = [];
-    this.chain.push(newBlock);
-    return newBlock;
-};
-
-Blockchain.prototype.getLasBlock = function () {
-    return this.chain[this.chain.length - 1];
-};
 
 //recipient is the one who receive
 Blockchain.prototype.createNewTransaction = function (amount, sender, recipient) {
@@ -59,8 +40,8 @@ Blockchain.prototype.hashBlock = function (previousBlockHash, currentBlockData, 
     return hash;
 };
 
-/*The proof aims to get the parameters and repeatedly mine new hash codes untill it finds the 
-any hash, starting with four zeros like '0000LJH2HG5KJ2G5KG25GK2'. To do that an algorithm
+/*The proof aims to get a parameters and repeatedly mine new hash codes untill it finds 
+any hash starting with four zeros like '0000LJH2HG5KJ2G5KG25GK2'. To do that an algorithm
 keeps constantly changing the nonce. It takes a very high computing proccessing and high amount
 of energy. It becomes safe because anyone that tries to remine the hash to get the exact result,
 would also to recreate every previous block that is linked to this one. After that they should
@@ -73,8 +54,26 @@ Blockchain.prototype.proofOfWork = function (previousBlockHash, currentBlockData
         nonce++;
         hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
     }
-
     return nonce;
+};
+
+Blockchain.prototype.createNewBlock = function (nonce, hash, previousBlockHash) {
+    //every new block will look like this
+    const newBlock = {
+        index: this.chain.length + 1,
+        timeStamp: Date.now(),
+        transactions: this.pendingTransactions,
+        nonce: nonce, //it's a number that refers to a proof of work
+        hash: hash, //all transactions will be compressed in a single String of data
+        previousBlockHash: previousBlockHash //all hashed data from the previous block
+    };
+    this.pendingTransactions = [];
+    this.chain.push(newBlock);
+    return newBlock;
+};
+
+Blockchain.prototype.getLasBlock = function () {
+    return this.chain[this.chain.length - 1];
 };
 
 //validate if a chain is legitimate or not
@@ -99,7 +98,6 @@ Blockchain.prototype.chainIsValid = function (blockchain) {
         }
         console.log('previousBlockHash =>', previousBlock['hash']);
         console.log('currentBlockHash =>', currentBlock['hash']);
-
     }
 
     const genesisBlock = blockchain[0];

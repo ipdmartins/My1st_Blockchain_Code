@@ -7,7 +7,7 @@ app.use(bodyparser.urlencoded({ extended: false }));
 const Blockchain = require('./blockchain');
 const bitcoin = new Blockchain();
 
-const uuid = require('uuid/v1');
+const uuid = require('uuid/v1');//creates a unique string
 //it creates an unique id with '-', but we don't want it, that's why the split
 const nodeAddress = uuid().split('-').join('');
 
@@ -15,12 +15,15 @@ const nodeAddress = uuid().split('-').join('');
 //behave as an array, so the number 3001 is considered the third element. The argv[2] serves
 //to get this element
 const port = process.argv[2];
+//it will allow to make requests to all the other nodes inside the network
 const rp = require('request-promise');
 
 app.get('/blockchain', function (req, res) {
     res.send(bitcoin);
 });
 
+/*A transaction uses the createNewTransaction method, passing a amount, a sender and recipient
+address. It gets back the block index created*/
 app.post('/transaction', function (req, res) {
     const newTransaction = req.body;
     const blockIndex = bitcoin.addTransactionToPendingTransactions(newTransaction);
@@ -34,6 +37,7 @@ app.post('/transaction/broadcast', function (req, res) {
     bitcoin.addTransactionToPendingTransactions(newTransaction);
 
     const requestPromises = [];
+    //networkNodes is an array variable
     bitcoin.networkNodes.forEach(networkNodeUrl => {
         const requestOptions = {
             uri: networkNodeUrl + '/transaction',
@@ -48,6 +52,7 @@ app.post('/transaction/broadcast', function (req, res) {
     });
 });
 
+//it'll create a new block using the createNewBlock method
 app.get('/mine', function (req, res) {
     const lastBlock = bitcoin.getLasBlock();
     const previousBlockHash = lastBlock['hash'];
@@ -126,6 +131,9 @@ app.post('/register-and-broadcast-node', function (req, res) {
     if (bitcoin.networkNodes.indexOf(newNodeUrl) == -1) bitcoin.networkNodes.push(newNodeUrl);
 
     const regNodesPromises = [];
+    /*It runs all the nodes already in the network, then call another function that will be
+    registering the new node data inside the existent node through the request asyncronous
+    promise*/
     bitcoin.networkNodes.forEach(networkNodeUrl => {
         const requestOptions = {
             uri: networkNodeUrl + '/register-node',
@@ -133,15 +141,16 @@ app.post('/register-and-broadcast-node', function (req, res) {
             body: { newNodeUrl: newNodeUrl },
             json: true
         };
-
         regNodesPromises.push(rp(requestOptions));
     });
-
+    /*At this point, all the network nodes already have the new node registration, now it gets
+    the resultant data and send it to the new node, to let it aware about the entire chain*/
     Promise.all(regNodesPromises)
         .then(data => {
             const bulkRegisterOptions = {
                 uri: newNodeUrl + '/register-nodes-bulk',
                 method: 'POST',
+                //take all nodes inside the network and send the data back to the new node
                 body: { allNetworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl] },
                 json: true
             };
@@ -153,13 +162,20 @@ app.post('/register-and-broadcast-node', function (req, res) {
         });
 });
 
-//register a node with network
+//register a node with network. EVERY NODE THAT RECEIVES A NEW NODE URL, NEEDS TO ONLY REGISTER
+//IT AND NOT BROADCAST IT, IF THEY DO SO, IT WILL SEVERLY DECREASE THE PERFOMANCE AND EVEN
+//BREAK THE NETWORK.
 app.post('/register-node', function (req, res) {
     const newNodeUrl = req.body.newNodeUrl;
+    //if the newNodeUrl is -1, means that it does not exists in the array, it'll be false
     const nodeNotAlreadyPresent = bitcoin.networkNodes.indexOf(newNodeUrl) == -1;
+    //it serves to not add itself in the chain
     const notCurrentNode = bitcoin.currentNodeUrl !== newNodeUrl;
     if (nodeNotAlreadyPresent && notCurrentNode) bitcoin.networkNodes.push(newNodeUrl);
     res.json({ note: 'New node registered successfully.' });
+    /*after this, if I go inside the browser url 3001 for example I have to see the url 3002
+    in the netWorkNodes variable, after test it with Postman for example. However, at this
+    point, for while the 3002 will not yet be aware of 3001. It'll be solved in the next function*/
 });
 
 //register multiple nodes at once
@@ -221,6 +237,7 @@ app.get('/consensus', function (req, res) {
 
 //Block explorer is an online API that allows to interact with the code inside our Blockchain
 //example (https://blockchain.info/q)
+//this functions server to query a specific hash and look for in the entire Blockchain for it
 app.get('/block/:blockHash', function (req, res) {
     const blockHash = req.params.blockHash;
     const correctBlock = bitcoin.getBlock(blockHash);
